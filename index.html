@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Foil Pump Power</title>
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --card: #101c2f;
+      --card2: #16243a;
+      --text: #f4f7fb;
+      --muted: #9fb0c5;
+      --accent: #36d399;
+      --warning: #fbbf24;
+      --danger: #fb7185;
+      --border: rgba(255,255,255,0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, #12345a 0%, var(--bg) 45%, #030712 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 18px;
+      padding-bottom: 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin: 12px 0 20px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status.running {
+      color: var(--accent);
+      border-color: rgba(54, 211, 153, 0.45);
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    .big-metric {
+      text-align: center;
+      padding: 24px 12px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .watts {
+      font-size: 4.6rem;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.08em;
+    }
+
+    .unit {
+      font-size: 1.5rem;
+      color: var(--muted);
+      margin-left: 4px;
+      letter-spacing: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .metric {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 92px;
+    }
+
+    .metric .name {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 1.6rem;
+      font-weight: 750;
+      letter-spacing: -0.04em;
+    }
+
+    .metric .small-unit {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-left: 2px;
+      font-weight: 500;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 16px;
+      padding: 16px 14px;
+      font-size: 1rem;
+      font-weight: 750;
+      color: #04111f;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #26364f;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.danger {
+      background: #3a1d2a;
+      color: #fecdd3;
+      border: 1px solid rgba(251,113,133,0.35);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .warning {
+      color: var(--warning);
+    }
+
+    .footer {
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.8rem;
+      margin-top: 22px;
+    }
+
+    @media (max-width: 430px) {
+      .app {
+        padding: 14px;
+      }
+
+      .watts {
+        font-size: 3.7rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .metric {
+        min-height: 86px;
+        padding: 12px;
+      }
+
+      .metric .value {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="header">
+      <h1>Foil Pump Power</h1>
+      <p>Phone accelerometer V1 training estimate</p>
+      <div id="status" class="status">Ready</div>
+    </section>
+
+    <section class="card">
+      <div class="label">Rider weight</div>
+      <div class="input-row">
+        <input id="weightInput" type="number" min="80" max="300" step="1" value="185" />
+        <span class="note">lb</span>
+      </div>
+      <p class="note">
+        This app estimates rider mechanical pumping power from vertical acceleration.
+        It is a relative training tool, not true foil hydrodynamic power.
+      </p>
+    </section>
+
+    <section class="card big-metric">
+      <div class="label">Live estimated power</div>
+      <div>
+        <span id="livePower" class="watts">0</span>
+        <span class="unit">W</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="metric">
+        <div class="name">Avg Power</div>
+        <div class="value"><span id="avgPower">0</span><span class="small-unit"> W</span></div>
+      </div>
+
+      <div class="metric">
+        <div class="name">Peak Power</div>
+        <div class="value"><span id="peakPower">0</span><span class="small-unit"> W</span></div>
+      </div>
+
+      <div class="metric">
+        <div class="name">Pump Count</div>
+        <div class="value"><span id="pumpCount">0</span></div>
+      </div>
+
+      <div class="metric">
+        <div class="name">Cadence</div>
+        <div class="value"><span id="cadence">0</span><span class="small-unit"> ppm</span></div>
+      </div>
+
+      <div class="metric">
+        <div class="name">Vert Accel</div>
+        <div class="value"><span id="verticalAccel">0.0</span><span class="small-unit"> m/s²</span></div>
+      </div>
+
+      <div class="metric">
+        <div class="name">Peak Load</div>
+        <div class="value"><span id="peakForce">0</span><span class="small-unit"> N</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="controls">
+        <button id="enableBtn">Enable Motion</button>
+        <button id="startBtn" class="secondary" disabled>Start</button>
+        <button id="stopBtn" class="danger" disabled>Stop</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+      </div>
+
+      <p class="note">
+        On iPhone, tap <strong>Enable Motion</strong> first. Then tap <strong>Start</strong>.
+        Keep the phone tight to your torso in a vest, hydration pack, or waterproof pouch.
+      </p>
+
+      <p class="note warning">
+        For water testing, use a waterproof case/pouch and keep the screen awake.
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="label">What the number means</div>
+      <p class="note">
+        The app estimates vertical rider force and vertical rider velocity, then calculates
+        positive mechanical power. Formula: Power ≈ Force × Velocity. Force is estimated
+        from rider mass and phone acceleration. Velocity is estimated by integrating acceleration,
+        so the number will drift and should be treated as approximate.
+      </p>
+    </section>
+
+    <div class="footer">
+      V1 prototype — compare easy vs hard pumping, not absolute lab-grade watts.
+    </div>
+  </main>
+
+  <script>
+    // -----------------------------
+    // Foil Pump Power V1
+    // -----------------------------
+
+    const G = 9.80665;
+
+    let motionEnabled = false;
+    let recording = false;
+
+    let lastTimestamp = null;
+    let verticalVelocity = 0;
+
+    let accelerationWindow = [];
+    let powerWindow = [];
+
+    let livePower = 0;
+    let avgPower = 0;
+    let peakPower = 0;
+    let peakForce = 0;
+
+    let pumpCount = 0;
+    let cadence = 0;
+    let previousAcceleration = 0;
+    let wasRising = false;
+    let lastPeakTime = null;
+
+    const statusEl = document.getElementById("status");
+    const weightInput = document.getElementById("weightInput");
+
+    const livePowerEl = document.getElementById("livePower");
+    const avgPowerEl = document.getElementById("avgPower");
+    const peakPowerEl = document.getElementById("peakPower");
+    const pumpCountEl = document.getElementById("pumpCount");
+    const cadenceEl = document.getElementById("cadence");
+    const verticalAccelEl = document.getElementById("verticalAccel");
+    const peakForceEl = document.getElementById("peakForce");
+
+    const enableBtn = document.getElementById("enableBtn");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function setStatus(message, isRunning = false) {
+      statusEl.textContent = message;
+      statusEl.classList.toggle("running", isRunning);
+    }
+
+    function getRiderMassKg() {
+      const lb = Number(weightInput.value || 185);
+      return lb * 0.45359237;
+    }
+
+    function resetData() {
+      lastTimestamp = null;
+      verticalVelocity = 0;
+
+      accelerationWindow = [];
+      powerWindow = [];
+
+      livePower = 0;
+      avgPower = 0;
+      peakPower = 0;
+      peakForce = 0;
+
+      pumpCount = 0;
+      cadence = 0;
+      previousAcceleration = 0;
+      wasRising = false;
+      lastPeakTime = null;
+
+      updateDisplay(0);
+    }
+
+    function updateDisplay(verticalAcceleration) {
+      livePowerEl.textContent = Math.round(livePower);
+      avgPowerEl.textContent = Math.round(avgPower);
+      peakPowerEl.textContent = Math.round(peakPower);
+      pumpCountEl.textContent = pumpCount;
+      cadenceEl.textContent = Math.round(cadence);
+      verticalAccelEl.textContent = verticalAcceleration.toFixed(1);
+      peakForceEl.textContent = Math.round(peakForce);
+    }
+
+    async function enableMotion() {
+      try {
+        // iOS Safari requires permission from a user button tap.
+        if (
+          typeof DeviceMotionEvent !== "undefined" &&
+          typeof DeviceMotionEvent.requestPermission === "function"
+        ) {
+          const permission = await DeviceMotionEvent.requestPermission();
+
+          if (permission !== "granted") {
+            setStatus("Motion permission denied");
+            return;
+          }
+        }
+
+        window.addEventListener("devicemotion", handleMotion, true);
+
+        motionEnabled = true;
+        startBtn.disabled = false;
+        enableBtn.disabled = true;
+
+        setStatus("Motion enabled. Tap Start.");
+      } catch (error) {
+        setStatus("Could not enable motion");
+        console.error(error);
+      }
+    }
+
+    function startRecording() {
+      if (!motionEnabled) {
+        setStatus("Tap Enable Motion first");
+        return;
+      }
+
+      resetData();
+      recording = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      setStatus("Recording", true);
+    }
+
+    function stopRecording() {
+      recording = false;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      setStatus("Stopped");
+    }
+
+    function handleMotion(event) {
+      if (!recording) return;
+
+      /*
+        accelerationIncludingGravity includes gravity.
+        acceleration tries to exclude gravity, but browser support varies.
+        For this V1, prefer acceleration.z if available.
+      */
+
+      const acc = event.acceleration || event.accelerationIncludingGravity;
+
+      if (!acc) {
+        setStatus("No acceleration data available");
+        return;
+      }
+
+      // Browser acceleration is usually already in m/s².
+      // z-axis is phone-relative, not perfect earth-vertical.
+      // For V1, this is acceptable if the phone is held in a consistent position.
+      let rawA = acc.z || 0;
+
+      // Timestamp in milliseconds. Convert to seconds.
+      const now = event.timeStamp / 1000;
+
+      if (lastTimestamp === null) {
+        lastTimestamp = now;
+        return;
+      }
+
+      const dt = now - lastTimestamp;
+      lastTimestamp = now;
+
+      if (dt <= 0 || dt > 0.2) return;
+
+      processAcceleration(rawA, dt, now);
+    }
+
+    function processAcceleration(rawA, dt, timestamp) {
+      const riderMassKg = getRiderMassKg();
+
+      // Bias removal: subtract recent average acceleration.
+      accelerationWindow.push(rawA);
+
+      if (accelerationWindow.length > 200) {
+        accelerationWindow.shift();
+      }
+
+      const meanA =
+        accelerationWindow.reduce((sum, value) => sum + value, 0) /
+        accelerationWindow.length;
+
+      const filteredA = rawA - meanA;
+
+      // Integrate acceleration to estimate vertical velocity.
+      verticalVelocity += filteredA * dt;
+
+      // Damping to fight integration drift.
+      verticalVelocity *= 0.995;
+
+      // Estimate vertical force.
+      const forceZ = Math.max(riderMassKg * (G + filteredA), 0);
+
+      // Power = force x velocity.
+      const rawPower = forceZ * verticalVelocity;
+
+      // Count only positive mechanical work.
+      livePower = Math.max(rawPower, 0);
+
+      peakPower = Math.max(peakPower, livePower);
+      peakForce = Math.max(peakForce, forceZ);
+
+      // Rolling average power.
+      powerWindow.push(livePower);
+
+      if (powerWindow.length > 500) {
+        powerWindow.shift();
+      }
+
+      avgPower =
+        powerWindow.reduce((sum, value) => sum + value, 0) /
+        powerWindow.length;
+
+      detectPumpPeak(filteredA, timestamp);
+
+      previousAcceleration = filteredA;
+
+      updateDisplay(filteredA);
+    }
+
+    function detectPumpPeak(a, timestamp) {
+      const threshold = 1.2;
+      const isAboveThreshold = a > threshold;
+      const changedFromRisingToFalling = wasRising && a < previousAcceleration;
+
+      if (isAboveThreshold && changedFromRisingToFalling) {
+        if (lastPeakTime !== null) {
+          const timeSinceLastPeak = timestamp - lastPeakTime;
+
+          if (timeSinceLastPeak > 0.3 && timeSinceLastPeak < 2.0) {
+            pumpCount += 1;
+            cadence = 60 / timeSinceLastPeak;
+            lastPeakTime = timestamp;
+
+            // Lightly reset velocity drift at each pump event.
+            verticalVelocity *= 0.5;
+          }
+        } else {
+          pumpCount += 1;
+          lastPeakTime = timestamp;
+        }
+      }
+
+      wasRising = a > previousAcceleration;
+    }
+
+    enableBtn.addEventListener("click", enableMotion);
+    startBtn.addEventListener("click", startRecording);
+    stopBtn.addEventListener("click", stopRecording);
+    resetBtn.addEventListener("click", resetData);
+
+    resetData();
+  </script>
+</body>
+</html>
