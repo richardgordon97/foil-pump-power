@@ -3,50 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Foil Pump Power</title>
+  <title>Foil Pump Power Logger</title>
 
   <style>
     :root {
-      --bg: #07111f;
-      --card: #101c2f;
-      --card2: #16243a;
+      --bg: #06111f;
+      --card: rgba(255,255,255,0.075);
+      --card2: rgba(255,255,255,0.045);
       --text: #f4f7fb;
       --muted: #9fb0c5;
       --accent: #36d399;
       --warning: #fbbf24;
       --danger: #fb7185;
-      --border: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.14);
+      --blue: #60a5fa;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: radial-gradient(circle at top, #12345a 0%, var(--bg) 45%, #030712 100%);
+      background: radial-gradient(circle at top, #12345a 0%, var(--bg) 45%, #020617 100%);
       color: var(--text);
       min-height: 100vh;
     }
 
     .app {
       width: 100%;
-      max-width: 720px;
+      max-width: 820px;
       margin: 0 auto;
-      padding: 18px;
-      padding-bottom: 40px;
+      padding: 16px;
+      padding-bottom: 48px;
     }
 
     .header {
       text-align: center;
-      margin: 12px 0 20px;
+      margin: 10px 0 18px;
     }
 
     .header h1 {
       margin: 0;
       font-size: 2rem;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.045em;
     }
 
     .header p {
@@ -68,39 +67,39 @@
 
     .status.running {
       color: var(--accent);
-      border-color: rgba(54, 211, 153, 0.45);
+      border-color: rgba(54, 211, 153, 0.5);
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      background: linear-gradient(180deg, var(--card), var(--card2));
       border: 1px solid var(--border);
       border-radius: 22px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.25);
       backdrop-filter: blur(12px);
     }
 
     .big-metric {
       text-align: center;
-      padding: 24px 12px;
+      padding: 22px 12px;
     }
 
     .label {
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       margin-bottom: 8px;
     }
 
     .watts {
-      font-size: 4.6rem;
+      font-size: 4.4rem;
       line-height: 1;
-      font-weight: 800;
+      font-weight: 850;
       letter-spacing: -0.08em;
     }
 
     .unit {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--muted);
       margin-left: 4px;
       letter-spacing: 0;
@@ -110,14 +109,15 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      margin-bottom: 14px;
     }
 
     .metric {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.055);
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 14px;
-      min-height: 92px;
+      min-height: 88px;
     }
 
     .metric .name {
@@ -127,13 +127,13 @@
     }
 
     .metric .value {
-      font-size: 1.6rem;
-      font-weight: 750;
+      font-size: 1.55rem;
+      font-weight: 780;
       letter-spacing: -0.04em;
     }
 
     .metric .small-unit {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--muted);
       margin-left: 2px;
       font-weight: 500;
@@ -150,10 +150,10 @@
       appearance: none;
       border: 0;
       border-radius: 16px;
-      padding: 16px 14px;
-      font-size: 1rem;
-      font-weight: 750;
-      color: #04111f;
+      padding: 15px 12px;
+      font-size: 0.98rem;
+      font-weight: 780;
+      color: #03111f;
       background: var(--accent);
       cursor: pointer;
     }
@@ -170,71 +170,116 @@
       border: 1px solid rgba(251,113,133,0.35);
     }
 
+    button.blue {
+      background: #1e3a5f;
+      color: #dbeafe;
+      border: 1px solid rgba(96,165,250,0.35);
+    }
+
     button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
 
     .input-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 90px;
       align-items: center;
       gap: 12px;
       margin-top: 10px;
     }
 
-    input[type="number"] {
+    input, select {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border-radius: 14px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.08);
       color: var(--text);
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
-    input[type="range"] {
-      width: 100%;
-    }
+    input::placeholder { color: rgba(255,255,255,0.35); }
 
     .note {
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       line-height: 1.45;
     }
 
-    .warning {
-      color: var(--warning);
+    .warning { color: var(--warning); }
+
+    canvas {
+      width: 100%;
+      height: 230px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .run-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .run-item {
+      padding: 12px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .run-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .run-title {
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .run-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .run-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .run-actions button {
+      padding: 9px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
     }
 
     .footer {
       color: var(--muted);
       text-align: center;
-      font-size: 0.8rem;
-      margin-top: 22px;
+      font-size: 0.78rem;
+      margin-top: 20px;
     }
 
-    @media (max-width: 430px) {
-      .app {
-        padding: 14px;
-      }
-
-      .watts {
-        font-size: 3.7rem;
-      }
-
-      .grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-
-      .metric {
-        min-height: 86px;
-        padding: 12px;
-      }
-
-      .metric .value {
-        font-size: 1.35rem;
-      }
+    @media (max-width: 460px) {
+      .app { padding: 13px; }
+      .watts { font-size: 3.55rem; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .metric { min-height: 82px; padding: 11px; }
+      .metric .value { font-size: 1.25rem; }
+      .controls { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .input-row { grid-template-columns: 1fr 74px; }
+      canvas { height: 210px; }
     }
   </style>
 </head>
@@ -243,28 +288,44 @@
   <main class="app">
     <section class="header">
       <h1>Foil Pump Power</h1>
-      <p>Phone accelerometer V1 training estimate</p>
+      <p>V2 web logger — angle-compensated vertical acceleration</p>
       <div id="status" class="status">Ready</div>
     </section>
 
     <section class="card">
-      <div class="label">Rider weight</div>
+      <div class="label">Run setup</div>
+
+      <input id="runNameInput" type="text" placeholder="Run name, example: Orca 1050 dock start" />
+
       <div class="input-row">
         <input id="weightInput" type="number" min="80" max="300" step="1" value="185" />
-        <span class="note">lb</span>
+        <span class="note">lb rider</span>
       </div>
+
+      <div class="input-row">
+        <select id="filterMode">
+          <option value="normal" selected>Normal filter</option>
+          <option value="smooth">Smooth filter</option>
+          <option value="raw">Raw-ish debug</option>
+        </select>
+        <span class="note">filter</span>
+      </div>
+
       <p class="note">
-        This app estimates rider mechanical pumping power from vertical acceleration.
-        It is a relative training tool, not true foil hydrodynamic power.
+        This version projects phone acceleration onto the gravity-defined vertical axis.
+        That means the phone can be sideways or angled in your bag and still estimate world-vertical pumping acceleration.
       </p>
     </section>
 
     <section class="card big-metric">
-      <div class="label">Live estimated power</div>
+      <div class="label">Smoothed estimated power</div>
       <div>
         <span id="livePower" class="watts">0</span>
         <span class="unit">W</span>
       </div>
+      <p class="note">
+        Displayed power is a 2-second smoothed estimate, not one-sample peak power.
+      </p>
     </section>
 
     <section class="grid">
@@ -274,7 +335,7 @@
       </div>
 
       <div class="metric">
-        <div class="name">Peak Power</div>
+        <div class="name">Peak 2s Power</div>
         <div class="value"><span id="peakPower">0</span><span class="small-unit"> W</span></div>
       </div>
 
@@ -289,7 +350,7 @@
       </div>
 
       <div class="metric">
-        <div class="name">Vert Accel</div>
+        <div class="name">World Vert Accel</div>
         <div class="value"><span id="verticalAccel">0.0</span><span class="small-unit"> m/s²</span></div>
       </div>
 
@@ -297,56 +358,77 @@
         <div class="name">Peak Load</div>
         <div class="value"><span id="peakForce">0</span><span class="small-unit"> N</span></div>
       </div>
+
+      <div class="metric">
+        <div class="name">Duration</div>
+        <div class="value"><span id="duration">0</span><span class="small-unit"> s</span></div>
+      </div>
+
+      <div class="metric">
+        <div class="name">Samples</div>
+        <div class="value"><span id="samples">0</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="label">Live Z / vertical acceleration graph</div>
+      <canvas id="liveChart" width="760" height="260"></canvas>
+      <p class="note">
+        Graph shows filtered world-vertical acceleration. This is the key signal for comparing pump amplitude and rhythm.
+      </p>
     </section>
 
     <section class="card">
       <div class="controls">
         <button id="enableBtn">Enable Motion</button>
-        <button id="startBtn" class="secondary" disabled>Start</button>
-        <button id="stopBtn" class="danger" disabled>Stop</button>
-        <button id="resetBtn" class="secondary">Reset</button>
+        <button id="startBtn" class="secondary" disabled>Start Run</button>
+        <button id="stopBtn" class="danger" disabled>Stop & Save</button>
+        <button id="resetBtn" class="secondary">Reset Live</button>
       </div>
 
-      <p class="note">
-        On iPhone, tap <strong>Enable Motion</strong> first. Then tap <strong>Start</strong>.
-        Keep the phone tight to your torso in a vest, hydration pack, or waterproof pouch.
-      </p>
-
       <p class="note warning">
-        For water testing, use a waterproof case/pouch and keep the screen awake.
+        Use Safari on iPhone. Keep the phone tight to your torso. A loose bag can still create fake acceleration because the phone is bouncing separately from your body.
       </p>
     </section>
 
     <section class="card">
-      <div class="label">What the number means</div>
+      <div class="label">Saved runs</div>
+      <div class="controls">
+        <button id="exportAllBtn" class="blue">Export All CSV</button>
+        <button id="clearRunsBtn" class="danger">Clear Saved Runs</button>
+      </div>
+      <div id="runList" class="run-list"></div>
+    </section>
+
+    <section class="card">
+      <div class="label">Important V2 notes</div>
       <p class="note">
-        The app estimates vertical rider force and vertical rider velocity, then calculates
-        positive mechanical power. Formula: Power ≈ Force × Velocity. Force is estimated
-        from rider mass and phone acceleration. Velocity is estimated by integrating acceleration,
-        so the number will drift and should be treated as approximate.
+        This is still not lab-grade foil power. It is a phone/body mechanical effort estimate.
+        The best use is comparing runs: easy vs hard, different foils, cadence changes, and pump amplitude.
+        The power calculation is intentionally filtered and capped to reduce fake 1500 W spikes from hand-shaking the phone.
       </p>
     </section>
 
     <div class="footer">
-      V1 prototype — compare easy vs hard pumping, not absolute lab-grade watts.
+      V2 prototype — phone IMU proof-of-concept before mast strain-gauge integration.
     </div>
   </main>
 
   <script>
-    // -----------------------------
-    // Foil Pump Power V1
-    // -----------------------------
-
     const G = 9.80665;
+    const STORAGE_KEY = "foilPumpPowerRunsV2";
 
     let motionEnabled = false;
     let recording = false;
 
     let lastTimestamp = null;
+    let runStartTime = null;
     let verticalVelocity = 0;
 
     let accelerationWindow = [];
     let powerWindow = [];
+    let twoSecondPowerWindow = [];
+    let chartWindow = [];
 
     let livePower = 0;
     let avgPower = 0;
@@ -359,8 +441,13 @@
     let wasRising = false;
     let lastPeakTime = null;
 
+    let currentRunSamples = [];
+    let savedRuns = [];
+
     const statusEl = document.getElementById("status");
+    const runNameInput = document.getElementById("runNameInput");
     const weightInput = document.getElementById("weightInput");
+    const filterMode = document.getElementById("filterMode");
 
     const livePowerEl = document.getElementById("livePower");
     const avgPowerEl = document.getElementById("avgPower");
@@ -369,11 +456,19 @@
     const cadenceEl = document.getElementById("cadence");
     const verticalAccelEl = document.getElementById("verticalAccel");
     const peakForceEl = document.getElementById("peakForce");
+    const durationEl = document.getElementById("duration");
+    const samplesEl = document.getElementById("samples");
 
     const enableBtn = document.getElementById("enableBtn");
     const startBtn = document.getElementById("startBtn");
     const stopBtn = document.getElementById("stopBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const exportAllBtn = document.getElementById("exportAllBtn");
+    const clearRunsBtn = document.getElementById("clearRunsBtn");
+
+    const canvas = document.getElementById("liveChart");
+    const ctx = canvas.getContext("2d");
+    const runListEl = document.getElementById("runList");
 
     function setStatus(message, isRunning = false) {
       statusEl.textContent = message;
@@ -385,12 +480,19 @@
       return lb * 0.45359237;
     }
 
-    function resetData() {
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function resetLiveData() {
       lastTimestamp = null;
+      runStartTime = null;
       verticalVelocity = 0;
 
       accelerationWindow = [];
       powerWindow = [];
+      twoSecondPowerWindow = [];
+      chartWindow = [];
 
       livePower = 0;
       avgPower = 0;
@@ -403,10 +505,12 @@
       wasRising = false;
       lastPeakTime = null;
 
-      updateDisplay(0);
+      currentRunSamples = [];
+      updateDisplay(0, 0);
+      drawChart(chartWindow);
     }
 
-    function updateDisplay(verticalAcceleration) {
+    function updateDisplay(verticalAcceleration, durationSeconds) {
       livePowerEl.textContent = Math.round(livePower);
       avgPowerEl.textContent = Math.round(avgPower);
       peakPowerEl.textContent = Math.round(peakPower);
@@ -414,18 +518,22 @@
       cadenceEl.textContent = Math.round(cadence);
       verticalAccelEl.textContent = verticalAcceleration.toFixed(1);
       peakForceEl.textContent = Math.round(peakForce);
+      durationEl.textContent = Math.round(durationSeconds || 0);
+      samplesEl.textContent = currentRunSamples.length;
     }
 
     async function enableMotion() {
       try {
-        // iOS Safari requires permission from a user button tap.
+        if (location.protocol !== "https:" && location.hostname !== "localhost") {
+          setStatus("Use the https GitHub Pages link on iPhone.");
+        }
+
         if (
           typeof DeviceMotionEvent !== "undefined" &&
           typeof DeviceMotionEvent.requestPermission === "function"
         ) {
-          const permission = await DeviceMotionEvent.requestPermission();
-
-          if (permission !== "granted") {
+          const motionPermission = await DeviceMotionEvent.requestPermission();
+          if (motionPermission !== "granted") {
             setStatus("Motion permission denied");
             return;
           }
@@ -436,8 +544,7 @@
         motionEnabled = true;
         startBtn.disabled = false;
         enableBtn.disabled = true;
-
-        setStatus("Motion enabled. Tap Start.");
+        setStatus("Motion enabled. Tap Start Run.");
       } catch (error) {
         setStatus("Could not enable motion");
         console.error(error);
@@ -450,7 +557,7 @@
         return;
       }
 
-      resetData();
+      resetLiveData();
       recording = true;
       startBtn.disabled = true;
       stopBtn.disabled = false;
@@ -461,53 +568,136 @@
       recording = false;
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      setStatus("Stopped");
+
+      if (currentRunSamples.length > 5) {
+        saveCurrentRun();
+        setStatus("Run saved");
+      } else {
+        setStatus("Stopped — not enough data to save");
+      }
     }
 
     function handleMotion(event) {
       if (!recording) return;
 
-      /*
-        accelerationIncludingGravity includes gravity.
-        acceleration tries to exclude gravity, but browser support varies.
-        For this V1, prefer acceleration.z if available.
-      */
+      const acc = event.acceleration;
+      const accG = event.accelerationIncludingGravity;
 
-      const acc = event.acceleration || event.accelerationIncludingGravity;
-
-      if (!acc) {
+      if (!acc && !accG) {
         setStatus("No acceleration data available");
         return;
       }
 
-      // Browser acceleration is usually already in m/s².
-      // z-axis is phone-relative, not perfect earth-vertical.
-      // For V1, this is acceptable if the phone is held in a consistent position.
-      let rawA = acc.z || 0;
-
-      // Timestamp in milliseconds. Convert to seconds.
       const now = event.timeStamp / 1000;
 
       if (lastTimestamp === null) {
         lastTimestamp = now;
+        runStartTime = now;
         return;
       }
 
       const dt = now - lastTimestamp;
       lastTimestamp = now;
 
-      if (dt <= 0 || dt > 0.2) return;
+      if (dt <= 0 || dt > 0.25) return;
 
-      processAcceleration(rawA, dt, now);
+      const verticalA = getWorldVerticalAcceleration(acc, accG);
+
+      processAcceleration(verticalA, dt, now);
+    }
+
+    function getWorldVerticalAcceleration(acc, accG) {
+      /*
+        Goal:
+        Get linear acceleration along the real-world vertical axis even if the phone
+        is sideways or angled in the bag.
+
+        Best case:
+        event.acceleration gives linear/user acceleration in phone axes.
+        event.accelerationIncludingGravity gives linear acceleration + gravity.
+        gravity vector ≈ accelerationIncludingGravity - acceleration.
+        Then project linear acceleration onto the gravity vector.
+
+        This removes dependence on the phone's local Z axis.
+      */
+
+      if (acc && accG &&
+          acc.x !== null && acc.y !== null && acc.z !== null &&
+          accG.x !== null && accG.y !== null && accG.z !== null) {
+
+        const ax = acc.x || 0;
+        const ay = acc.y || 0;
+        const az = acc.z || 0;
+
+        const gx = (accG.x || 0) - ax;
+        const gy = (accG.y || 0) - ay;
+        const gz = (accG.z || 0) - az;
+
+        const gMag = Math.sqrt(gx*gx + gy*gy + gz*gz);
+
+        if (gMag > 6 && gMag < 13) {
+          const ux = gx / gMag;
+          const uy = gy / gMag;
+          const uz = gz / gMag;
+
+          // Projection of user acceleration onto gravity-defined vertical axis.
+          // Multiply by -1 so upward body acceleration tends to show positive.
+          return -(ax*ux + ay*uy + az*uz);
+        }
+      }
+
+      /*
+        Fallback:
+        If browser does not provide separated linear acceleration, use phone z.
+        This is less reliable and depends on phone orientation.
+      */
+
+      if (acc && acc.z !== null) return acc.z || 0;
+      if (accG && accG.z !== null) return (accG.z || 0) - G;
+      return 0;
+    }
+
+    function getFilterSettings() {
+      const mode = filterMode.value;
+
+      if (mode === "smooth") {
+        return {
+          meanWindow: 240,
+          accelCap: 4.0,
+          velocityCap: 0.9,
+          velocityDamping: 0.985,
+          powerCap: 700,
+          peakThreshold: 0.9
+        };
+      }
+
+      if (mode === "raw") {
+        return {
+          meanWindow: 90,
+          accelCap: 9.0,
+          velocityCap: 2.0,
+          velocityDamping: 0.997,
+          powerCap: 1500,
+          peakThreshold: 1.4
+        };
+      }
+
+      return {
+        meanWindow: 180,
+        accelCap: 5.5,
+        velocityCap: 1.25,
+        velocityDamping: 0.99,
+        powerCap: 900,
+        peakThreshold: 1.1
+      };
     }
 
     function processAcceleration(rawA, dt, timestamp) {
       const riderMassKg = getRiderMassKg();
+      const settings = getFilterSettings();
 
-      // Bias removal: subtract recent average acceleration.
       accelerationWindow.push(rawA);
-
-      if (accelerationWindow.length > 200) {
+      if (accelerationWindow.length > settings.meanWindow) {
         accelerationWindow.shift();
       }
 
@@ -515,30 +705,40 @@
         accelerationWindow.reduce((sum, value) => sum + value, 0) /
         accelerationWindow.length;
 
-      const filteredA = rawA - meanA;
+      // Bias removal, then clamp unrealistic spikes.
+      let filteredA = rawA - meanA;
+      filteredA = clamp(filteredA, -settings.accelCap, settings.accelCap);
 
-      // Integrate acceleration to estimate vertical velocity.
+      // Integrate acceleration to estimate vertical velocity, with damping and cap.
       verticalVelocity += filteredA * dt;
+      verticalVelocity *= settings.velocityDamping;
+      verticalVelocity = clamp(verticalVelocity, -settings.velocityCap, settings.velocityCap);
 
-      // Damping to fight integration drift.
-      verticalVelocity *= 0.995;
-
-      // Estimate vertical force.
+      // Estimate load. Use filtered vertical acceleration.
       const forceZ = Math.max(riderMassKg * (G + filteredA), 0);
 
-      // Power = force x velocity.
-      const rawPower = forceZ * verticalVelocity;
+      // Positive power estimate.
+      const rawPower = Math.max(forceZ * Math.max(verticalVelocity, 0), 0);
 
-      // Count only positive mechanical work.
-      livePower = Math.max(rawPower, 0);
+      // Cap the raw power to keep shake spikes from dominating.
+      const cappedPower = clamp(rawPower, 0, settings.powerCap);
+
+      // Smooth displayed power over about 2 seconds.
+      twoSecondPowerWindow.push(cappedPower);
+      const maxPowerWindowLength = 120;
+      if (twoSecondPowerWindow.length > maxPowerWindowLength) {
+        twoSecondPowerWindow.shift();
+      }
+
+      livePower =
+        twoSecondPowerWindow.reduce((sum, value) => sum + value, 0) /
+        twoSecondPowerWindow.length;
 
       peakPower = Math.max(peakPower, livePower);
       peakForce = Math.max(peakForce, forceZ);
 
-      // Rolling average power.
       powerWindow.push(livePower);
-
-      if (powerWindow.length > 500) {
+      if (powerWindow.length > 900) {
         powerWindow.shift();
       }
 
@@ -546,15 +746,34 @@
         powerWindow.reduce((sum, value) => sum + value, 0) /
         powerWindow.length;
 
-      detectPumpPeak(filteredA, timestamp);
+      detectPumpPeak(filteredA, timestamp, settings.peakThreshold);
+
+      const duration = runStartTime ? timestamp - runStartTime : 0;
+
+      const sample = {
+        t: Number(duration.toFixed(3)),
+        rawVerticalA: Number(rawA.toFixed(4)),
+        filteredVerticalA: Number(filteredA.toFixed(4)),
+        verticalVelocity: Number(verticalVelocity.toFixed(4)),
+        forceN: Number(forceZ.toFixed(2)),
+        powerW: Number(livePower.toFixed(2)),
+        cadence: Number(cadence.toFixed(2)),
+        pumpCount: pumpCount
+      };
+
+      currentRunSamples.push(sample);
+
+      // Keep live chart around last 15 seconds or last 450 samples.
+      chartWindow.push(sample);
+      if (chartWindow.length > 450) chartWindow.shift();
 
       previousAcceleration = filteredA;
 
-      updateDisplay(filteredA);
+      updateDisplay(filteredA, duration);
+      drawChart(chartWindow);
     }
 
-    function detectPumpPeak(a, timestamp) {
-      const threshold = 1.2;
+    function detectPumpPeak(a, timestamp, threshold) {
       const isAboveThreshold = a > threshold;
       const changedFromRisingToFalling = wasRising && a < previousAcceleration;
 
@@ -567,8 +786,8 @@
             cadence = 60 / timeSinceLastPeak;
             lastPeakTime = timestamp;
 
-            // Lightly reset velocity drift at each pump event.
-            verticalVelocity *= 0.5;
+            // Cycle-level drift correction.
+            verticalVelocity *= 0.35;
           }
         } else {
           pumpCount += 1;
@@ -579,12 +798,345 @@
       wasRising = a > previousAcceleration;
     }
 
+    function drawChart(samples) {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Background
+      ctx.fillStyle = "rgba(0,0,0,0.12)";
+      ctx.fillRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = "rgba(255,255,255,0.11)";
+      ctx.lineWidth = 1;
+
+      for (let i = 1; i < 5; i++) {
+        const y = (h / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Zero line
+      ctx.strokeStyle = "rgba(251,191,36,0.55)";
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
+      ctx.stroke();
+
+      if (!samples || samples.length < 2) {
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "18px -apple-system, BlinkMacSystemFont, Segoe UI, Arial";
+        ctx.fillText("Acceleration graph will appear here", 24, 46);
+        return;
+      }
+
+      const maxAbs = Math.max(
+        2,
+        ...samples.map(s => Math.abs(s.filteredVerticalA))
+      );
+
+      // Use at least +/- 4 m/s² scale for comparability.
+      const scaleMax = Math.max(4, Math.ceil(maxAbs));
+
+      ctx.strokeStyle = "#36d399";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+
+      samples.forEach((s, i) => {
+        const x = (i / (samples.length - 1)) * w;
+        const normalized = s.filteredVerticalA / scaleMax;
+        const y = h / 2 - normalized * (h * 0.42);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.72)";
+      ctx.font = "14px -apple-system, BlinkMacSystemFont, Segoe UI, Arial";
+      ctx.fillText(`+/- ${scaleMax} m/s²`, 14, 22);
+      ctx.fillText("filtered world-vertical acceleration", 14, h - 14);
+    }
+
+    function summarizeRun(samples) {
+      if (!samples.length) {
+        return {
+          duration: 0,
+          avgPower: 0,
+          peakPower: 0,
+          maxAccel: 0,
+          minAccel: 0,
+          pumpCount: 0,
+          avgCadence: 0
+        };
+      }
+
+      const duration = samples[samples.length - 1].t;
+      const avgPower =
+        samples.reduce((sum, s) => sum + s.powerW, 0) / samples.length;
+      const peakPower = Math.max(...samples.map(s => s.powerW));
+      const maxAccel = Math.max(...samples.map(s => s.filteredVerticalA));
+      const minAccel = Math.min(...samples.map(s => s.filteredVerticalA));
+      const pumpCount = samples[samples.length - 1].pumpCount;
+
+      const cadenceValues = samples.map(s => s.cadence).filter(v => v > 0);
+      const avgCadence = cadenceValues.length
+        ? cadenceValues.reduce((sum, v) => sum + v, 0) / cadenceValues.length
+        : 0;
+
+      return {
+        duration,
+        avgPower,
+        peakPower,
+        maxAccel,
+        minAccel,
+        pumpCount,
+        avgCadence
+      };
+    }
+
+    function saveCurrentRun() {
+      const name = runNameInput.value.trim() || "Foil run";
+      const date = new Date().toISOString();
+      const summary = summarizeRun(currentRunSamples);
+
+      const run = {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        name,
+        date,
+        riderWeightLb: Number(weightInput.value || 185),
+        filterMode: filterMode.value,
+        summary,
+        samples: currentRunSamples
+      };
+
+      savedRuns.unshift(run);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRuns));
+      renderRunList();
+    }
+
+    function loadRuns() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        savedRuns = raw ? JSON.parse(raw) : [];
+      } catch {
+        savedRuns = [];
+      }
+      renderRunList();
+    }
+
+    function renderRunList() {
+      runListEl.innerHTML = "";
+
+      if (!savedRuns.length) {
+        runListEl.innerHTML = `<p class="note">No saved runs yet. Record a run and tap Stop & Save.</p>`;
+        return;
+      }
+
+      savedRuns.forEach(run => {
+        const s = run.summary;
+        const item = document.createElement("div");
+        item.className = "run-item";
+
+        item.innerHTML = `
+          <div class="run-top">
+            <div>
+              <div class="run-title">${escapeHtml(run.name)}</div>
+              <div class="run-meta">
+                ${new Date(run.date).toLocaleString()}<br>
+                ${Math.round(s.duration)}s · ${run.samples.length} samples · ${run.riderWeightLb} lb · ${run.filterMode} filter<br>
+                Avg ${Math.round(s.avgPower)} W · Peak 2s ${Math.round(s.peakPower)} W · Pumps ${s.pumpCount} · Cadence ${Math.round(s.avgCadence)} ppm<br>
+                Accel range ${s.minAccel.toFixed(1)} to ${s.maxAccel.toFixed(1)} m/s²
+              </div>
+            </div>
+          </div>
+          <div class="run-actions">
+            <button class="blue" data-action="view" data-id="${run.id}">View Graph</button>
+            <button class="secondary" data-action="csv" data-id="${run.id}">Export CSV</button>
+            <button class="danger" data-action="delete" data-id="${run.id}">Delete</button>
+          </div>
+        `;
+
+        runListEl.appendChild(item);
+      });
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function exportRunCSV(run) {
+      const header = [
+        "run_name",
+        "date",
+        "rider_weight_lb",
+        "filter_mode",
+        "t_seconds",
+        "raw_vertical_accel_mps2",
+        "filtered_vertical_accel_mps2",
+        "vertical_velocity_mps",
+        "force_N",
+        "power_W",
+        "cadence_ppm",
+        "pump_count"
+      ];
+
+      const rows = run.samples.map(s => [
+        csvSafe(run.name),
+        run.date,
+        run.riderWeightLb,
+        run.filterMode,
+        s.t,
+        s.rawVerticalA,
+        s.filteredVerticalA,
+        s.verticalVelocity,
+        s.forceN,
+        s.powerW,
+        s.cadence,
+        s.pumpCount
+      ]);
+
+      downloadCSV(`${safeFileName(run.name)}.csv`, [header, ...rows]);
+    }
+
+    function exportAllCSV() {
+      if (!savedRuns.length) {
+        setStatus("No runs to export");
+        return;
+      }
+
+      const header = [
+        "run_id",
+        "run_name",
+        "date",
+        "rider_weight_lb",
+        "filter_mode",
+        "t_seconds",
+        "raw_vertical_accel_mps2",
+        "filtered_vertical_accel_mps2",
+        "vertical_velocity_mps",
+        "force_N",
+        "power_W",
+        "cadence_ppm",
+        "pump_count"
+      ];
+
+      const rows = [];
+
+      savedRuns.forEach(run => {
+        run.samples.forEach(s => {
+          rows.push([
+            run.id,
+            csvSafe(run.name),
+            run.date,
+            run.riderWeightLb,
+            run.filterMode,
+            s.t,
+            s.rawVerticalA,
+            s.filteredVerticalA,
+            s.verticalVelocity,
+            s.forceN,
+            s.powerW,
+            s.cadence,
+            s.pumpCount
+          ]);
+        });
+      });
+
+      downloadCSV("foil_pump_power_all_runs.csv", [header, ...rows]);
+    }
+
+    function csvSafe(value) {
+      const str = String(value);
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replaceAll('"', '""')}"`;
+      }
+      return str;
+    }
+
+    function downloadCSV(filename, rows) {
+      const csv = rows.map(row => row.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    }
+
+    function safeFileName(name) {
+      return String(name)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 60) || "foil_run";
+    }
+
+    runListEl.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+
+      const id = button.dataset.id;
+      const action = button.dataset.action;
+      const run = savedRuns.find(r => r.id === id);
+      if (!run) return;
+
+      if (action === "view") {
+        chartWindow = run.samples.slice(-450);
+        drawChart(chartWindow);
+        setStatus(`Viewing: ${run.name}`);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      if (action === "csv") {
+        exportRunCSV(run);
+      }
+
+      if (action === "delete") {
+        savedRuns = savedRuns.filter(r => r.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRuns));
+        renderRunList();
+        setStatus("Run deleted");
+      }
+    });
+
     enableBtn.addEventListener("click", enableMotion);
     startBtn.addEventListener("click", startRecording);
     stopBtn.addEventListener("click", stopRecording);
-    resetBtn.addEventListener("click", resetData);
+    resetBtn.addEventListener("click", () => {
+      resetLiveData();
+      setStatus("Live data reset");
+    });
 
-    resetData();
+    exportAllBtn.addEventListener("click", exportAllCSV);
+
+    clearRunsBtn.addEventListener("click", () => {
+      const ok = confirm("Delete all saved runs from this phone/browser?");
+      if (!ok) return;
+      savedRuns = [];
+      localStorage.removeItem(STORAGE_KEY);
+      renderRunList();
+      setStatus("All saved runs cleared");
+    });
+
+    resetLiveData();
+    loadRuns();
+    drawChart([]);
   </script>
 </body>
 </html>
